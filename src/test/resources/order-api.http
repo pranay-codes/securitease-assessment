@@ -4,6 +4,10 @@ GET {{baseUrl}}/order
 
 ###
 
+GET {{baseUrl}}/order/1
+
+###
+
 POST {{baseUrl}}/order
 Content-Type: application/json
 

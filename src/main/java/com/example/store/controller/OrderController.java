@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,6 +24,13 @@ public class OrderController {
     @GetMapping
     public List<OrderDTO> getAllOrders() {
         return orderMapper.ordersToOrderDTOs(orderRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public OrderDTO getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id)
+                .map(orderMapper::orderToOrderDTO)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
     }
 
     @PostMapping

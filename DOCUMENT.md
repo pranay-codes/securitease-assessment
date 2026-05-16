@@ -10,6 +10,15 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-16 - Add order lookup by ID endpoint
+
+- Summary: Added `GET /order/{id}` to fetch a single order, plus controller tests for found and not-found behavior.
+- Files: `src/main/java/com/example/store/controller/OrderController.java`, `src/test/java/com/example/store/controller/OrderContollerTests.java`, `OpenAPI.yaml`, `src/test/resources/order-api.http`
+- Reason: Task 1 requires the order API to support lookup of a specific order by numeric ID.
+- Impact: API behavior now includes `200 OK` with an `OrderDTO` for an existing order and `404 Not Found` for a missing order. No schema changes.
+- Verification: Added WebMvc tests for success and not-found flows. Attempted `./gradlew test --tests com.example.store.controller.OrderControllerTests`, but the run is currently blocked in this environment because Gradle is executing with Java 24 while the project toolchain targets Java 17, causing Jacoco task initialization to fail before tests run.
+- Risks/Follow-ups: Re-run the focused Gradle test command on a Java 17 runtime to complete runtime verification.
+
 ### 2026-05-16 - Initial setup
 
 - Created `DOCUMENT.md` in the project root.
