@@ -10,7 +10,7 @@ Content-Type: application/json
 {
   "description": "Test Order",
   "customer": {
-    "id": 1
+    "id": 4
   }
 }
 
