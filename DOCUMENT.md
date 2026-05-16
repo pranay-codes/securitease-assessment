@@ -10,6 +10,24 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-16 - Remove Docker runtime smoke testing from CI
+
+- Summary: Simplified the GitHub Actions delivery pipeline by removing the PostgreSQL service container and Docker runtime smoke test, while keeping Gradle validation plus Docker build and GHCR publish behavior.
+- Files: `.github/workflows/ci-docker.yml`, `README.md`, `DOCUMENT.md`
+- Reason: The requested CI behavior is to stop testing the Docker image during the workflow and keep the pipeline focused on build validation and image publication.
+- Impact: Pull requests to `master` still validate formatting, tests, jar packaging, and Docker image build. Pushes to `master` still publish the Docker image to GHCR, but CI no longer proves container startup against PostgreSQL before publishing.
+- Verification: Reviewed the workflow after the edit to confirm the `postgres` service and smoke-test step were removed and that `docker/build-push-action` still runs for both PR builds and `master` publishes. No additional build or runtime commands were run in this follow-up because the requested change was to remove the Docker image test and you indicated you would handle testing manually.
+- Risks/Follow-ups: This shortens CI and removes a runtime gate, so broken startup behavior caused by image/runtime wiring would now be caught only by manual testing or a later deployment-stage check.
+
+### 2026-05-16 - Add GitHub Actions CI pipeline and Docker image delivery
+
+- Summary: Added a GitHub Actions workflow that validates the Gradle build, builds a production Docker image, and publishes the image to GHCR on pushes to `master`. Also added a multi-stage `Dockerfile`, `.dockerignore`, and README guidance for local and registry-based container usage.
+- Files: `.github/workflows/ci-docker.yml`, `Dockerfile`, `.dockerignore`, `README.md`, `DOCUMENT.md`
+- Reason: The assessment bonus task requires a production-oriented CI pipeline that reliably builds the project and delivers it as a Dockerized image with verification gates before publication.
+- Impact: The repository now has an explicit delivery contract through `ghcr.io/<owner>/store-main`, CI validation on pull requests to `master`, and automatic image publication for pushes to `master`. Runtime configuration remains environment-driven through standard Spring datasource variables.
+- Verification: Built the Docker image locally with `docker build -t store:local .`. Attempted Gradle validation inside a Java 17 Docker environment, but the run hit existing Spotless line-ending violations in repository files and earlier attempts also hit Docker-on-Windows filesystem friction while mounting the workspace. Local host Gradle verification remains blocked when run directly because this machine only has `C:\Program Files\Java\jdk-24`, while the project and CI pipeline are pinned to Java 17.
+- Risks/Follow-ups: GHCR publication depends on the repository running in GitHub with package permissions enabled. If runtime assurance is needed again later, reintroduce a smoke test in CI or add a deployment-stage health check. Existing Spotless line-ending violations may still need cleanup before the validation job passes consistently in GitHub Actions.
+
 ### 2026-05-16 - Add reusable products and enrich order responses
 
 - Summary: Added first-class product support with a reusable `product` model, an `order_product` join table, new `/products` create/list/detail endpoints, product-aware order responses, and ID-based order creation that links existing products to an order.

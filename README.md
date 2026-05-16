@@ -34,6 +34,41 @@ You should be able to run the service using
 
 The application uses Liquibase to migrate the schema. Some sample data is provided. You can create more data by reading the documentation in utils/README.md
 
+# Docker image
+This repository now includes a production Docker image build and a GitHub Actions pipeline that validates the app and publishes container images to GHCR on pushes to `master`.
+
+The canonical image location is:
+```text
+ghcr.io/<owner>/store-main
+```
+
+You can build the image locally with:
+```shell
+docker build -t store:local .
+```
+
+You can run the image by pointing Spring at PostgreSQL through environment variables:
+```shell
+docker run --rm \
+  -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5433/store \
+  -e SPRING_DATASOURCE_USERNAME=admin \
+  -e SPRING_DATASOURCE_PASSWORD=admin \
+  --add-host=host.docker.internal:host-gateway \
+  store:local
+```
+
+If you want to pull the published image from GHCR instead, replace `store:local` with:
+```text
+ghcr.io/<owner>/store-main:latest
+```
+
+The CI pipeline performs these checks before publishing:
+* `./gradlew spotlessCheck`
+* `./gradlew test`
+* `./gradlew bootJar`
+* Docker image build
+
 # Data model
 An order has an ID, a description, and is associated with the customer which made the order.
 A customer has an ID, a name, and 0 or more orders.
