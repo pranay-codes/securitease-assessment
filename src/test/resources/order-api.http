@@ -21,7 +21,7 @@ GET {{baseUrl}}/order?page=0&size=250
 
 ###
 
-GET {{baseUrl}}/order/1
+GET {{baseUrl}}/order/10004
 
 ###
 
@@ -35,5 +35,5 @@ Content-Type: application/json
 {
   "description": "Test Order",
   "customerId": 4,
-  "productIds": [1, 2]
+  "productIds": [1]
 }
