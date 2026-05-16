@@ -73,7 +73,8 @@ class CustomerControllerTests {
 
         mockMvc.perform(get("/customer"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..name").value("John Doe"));
+                .andExpect(jsonPath("$..name").value("John Doe"))
+                .andExpect(jsonPath("$[0].orders").doesNotExist());
     }
 
     @Test
@@ -94,7 +95,8 @@ class CustomerControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("John Doe"));
+                .andExpect(jsonPath("$[0].name").value("John Doe"))
+                .andExpect(jsonPath("$[0].orders").doesNotExist());
     }
 
     @Test

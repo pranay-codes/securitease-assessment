@@ -10,6 +10,15 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-16 - Optimize GET read paths with pagination and explicit fetching
+
+- Summary: Converted `GET /order` to a paginated endpoint, added explicit order/customer fetch paths to avoid lazy-loading during response mapping, changed `GET /customer` to return lightweight summaries, moved customer word-substring search into the database, and added supporting PostgreSQL indexes.
+- Files: `src/main/java/com/example/store/controller/OrderController.java`, `src/main/java/com/example/store/controller/CustomerController.java`, `src/main/java/com/example/store/service/OrderQueryService.java`, `src/main/java/com/example/store/service/CustomerSearchService.java`, `src/main/java/com/example/store/repository/OrderRepository.java`, `src/main/java/com/example/store/repository/CustomerRepository.java`, `src/main/java/com/example/store/mapper/OrderMapper.java`, `src/main/java/com/example/store/mapper/CustomerMapper.java`, `src/main/java/com/example/store/dto/CustomerSummaryDTO.java`, `src/main/java/com/example/store/dto/OrderSummaryDTO.java`, `src/main/resources/db/changelog/db.changelog-master.yaml`, `src/main/resources/db/changelog/db.changelog-4.yaml`, `src/test/java/com/example/store/controller/OrderContollerTests.java`, `src/test/java/com/example/store/controller/CustomerControllerTests.java`, `src/test/java/com/example/store/service/CustomerSearchServiceTests.java`, `src/test/java/com/example/store/service/OrderQueryServiceTests.java`, `OpenAPI.yaml`, `build.gradle`
+- Reason: Production GET endpoints were doing unbounded reads and mapper-triggered lazy relationship loads against a remote high-latency database.
+- Impact: `GET /order` now returns a paginated payload with Spring paging params and a hard max page size. `GET /customer` now returns summary DTOs without embedded orders. Order detail and list reads now use explicit fetch paths, and PostgreSQL indexes support the main join and substring-search patterns.
+- Verification: Ran `./gradlew.bat spotlessApply test` successfully after the implementation changes. This covered compilation, controller/service tests, and JaCoCo report generation.
+- Risks/Follow-ups: If downstream clients depended on the old unpaginated order contract or embedded customer orders in collection responses, they will need to adjust to the new GET payloads.
+
 ### 2026-05-16 - Expand customer search test coverage
 
 - Summary: Added controller tests for empty, whitespace-only, uppercase, multi-match, and second-word query scenarios, plus service tests for trimmed queries and safely ignoring null or blank customer names.

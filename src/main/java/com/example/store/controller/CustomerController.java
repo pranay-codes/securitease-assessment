@@ -1,6 +1,7 @@
 package com.example.store.controller;
 
 import com.example.store.dto.CustomerDTO;
+import com.example.store.dto.CustomerSummaryDTO;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
@@ -23,8 +24,8 @@ public class CustomerController {
     private final CustomerSearchService customerSearchService;
 
     @GetMapping
-    public List<CustomerDTO> getAllCustomers(@RequestParam(required = false) String query) {
-        return customerMapper.customersToCustomerDTOs(customerSearchService.findCustomersByQuery(query));
+    public List<CustomerSummaryDTO> getAllCustomers(@RequestParam(required = false) String query) {
+        return customerMapper.customersToCustomerSummaryDTOs(customerSearchService.findCustomersByQuery(query));
     }
 
     @PostMapping

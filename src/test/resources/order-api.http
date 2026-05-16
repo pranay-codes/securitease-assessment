@@ -4,6 +4,23 @@ GET {{baseUrl}}/order
 
 ###
 
+GET {{baseUrl}}/order?page=0&size=20&sort=id,asc
+
+
+###
+
+GET {{baseUrl}}/order?page=5&size=20&sort=id,asc
+
+###
+
+GET {{baseUrl}}/order?page=1&size=5&sort=id,desc
+
+###
+
+GET {{baseUrl}}/order?page=0&size=250
+
+###
+
 GET {{baseUrl}}/order/1
 
 ###
@@ -21,7 +38,3 @@ Content-Type: application/json
     "id": 4
   }
 }
-
-###
-
-GET {{baseUrl}}/order

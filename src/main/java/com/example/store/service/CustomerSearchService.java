@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -18,23 +17,10 @@ public class CustomerSearchService {
 
     public List<Customer> findCustomersByQuery(String query) {
         if (query == null || query.isBlank()) {
-            return customerRepository.findAll();
+            return customerRepository.findAllByOrderByIdAsc();
         }
 
         String normalizedQuery = query.trim();
-        return customerRepository.findByNameContainingIgnoreCase(normalizedQuery).stream()
-                .filter(customer -> nameContainsQueryWithinSingleWord(customer.getName(), normalizedQuery))
-                .toList();
-    }
-
-    private boolean nameContainsQueryWithinSingleWord(String name, String query) {
-        if (name == null || name.isBlank()) {
-            return false;
-        }
-
-        String normalizedQuery = query.toLowerCase(Locale.ROOT);
-        return List.of(name.split("\\s+")).stream()
-                .map(word -> word.toLowerCase(Locale.ROOT))
-                .anyMatch(word -> word.contains(normalizedQuery));
+        return customerRepository.searchByNameWordContaining(normalizedQuery);
     }
 }

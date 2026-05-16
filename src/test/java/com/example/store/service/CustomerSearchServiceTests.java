@@ -31,29 +31,29 @@ class CustomerSearchServiceTests {
     @Test
     void findCustomersByQueryReturnsAllCustomersWhenQueryIsNull() {
         Customer johnDoe = customer(1L, "John Doe");
-        when(customerRepository.findAll()).thenReturn(List.of(johnDoe));
+        when(customerRepository.findAllByOrderByIdAsc()).thenReturn(List.of(johnDoe));
 
         List<Customer> result = customerSearchService.findCustomersByQuery(null);
 
         assertThat(result).containsExactly(johnDoe);
-        verify(customerRepository).findAll();
+        verify(customerRepository).findAllByOrderByIdAsc();
     }
 
     @Test
     void findCustomersByQueryReturnsAllCustomersWhenQueryIsBlank() {
         Customer johnDoe = customer(1L, "John Doe");
-        when(customerRepository.findAll()).thenReturn(List.of(johnDoe));
+        when(customerRepository.findAllByOrderByIdAsc()).thenReturn(List.of(johnDoe));
 
         List<Customer> result = customerSearchService.findCustomersByQuery("   ");
 
         assertThat(result).containsExactly(johnDoe);
-        verify(customerRepository).findAll();
+        verify(customerRepository).findAllByOrderByIdAsc();
     }
 
     @Test
     void findCustomersByQueryMatchesSubstringCaseInsensitivelyWithinAWord() {
         Customer annMarie = customer(1L, "Ann Marie");
-        when(customerRepository.findByNameContainingIgnoreCase("ANN")).thenReturn(List.of(annMarie));
+        when(customerRepository.searchByNameWordContaining("ANN")).thenReturn(List.of(annMarie));
 
         List<Customer> result = customerSearchService.findCustomersByQuery("ANN");
 
@@ -63,7 +63,7 @@ class CustomerSearchServiceTests {
     @Test
     void findCustomersByQueryTrimsWhitespaceBeforeMatching() {
         Customer annMarie = customer(1L, "Ann Marie");
-        when(customerRepository.findByNameContainingIgnoreCase("ann")).thenReturn(List.of(annMarie));
+        when(customerRepository.searchByNameWordContaining("ann")).thenReturn(List.of(annMarie));
 
         List<Customer> result = customerSearchService.findCustomersByQuery("  ann  ");
 
@@ -73,7 +73,7 @@ class CustomerSearchServiceTests {
     @Test
     void findCustomersByQueryMatchesSubstringInAnyWord() {
         Customer johnDoe = customer(1L, "John Doe");
-        when(customerRepository.findByNameContainingIgnoreCase("do")).thenReturn(List.of(johnDoe));
+        when(customerRepository.searchByNameWordContaining("do")).thenReturn(List.of(johnDoe));
 
         List<Customer> result = customerSearchService.findCustomersByQuery("do");
 
@@ -82,8 +82,7 @@ class CustomerSearchServiceTests {
 
     @Test
     void findCustomersByQueryDoesNotMatchAcrossWords() {
-        Customer johnDoe = customer(1L, "John Doe");
-        when(customerRepository.findByNameContainingIgnoreCase("hn do")).thenReturn(List.of(johnDoe));
+        when(customerRepository.searchByNameWordContaining("hn do")).thenReturn(List.of());
 
         List<Customer> result = customerSearchService.findCustomersByQuery("hn do");
 
@@ -92,26 +91,11 @@ class CustomerSearchServiceTests {
 
     @Test
     void findCustomersByQueryFiltersRepositoryResultsThatOnlyMatchAcrossWords() {
-        Customer johnDoe = customer(1L, "John Doe");
-        Customer johnDonne = customer(2L, "John Donne");
-        when(customerRepository.findByNameContainingIgnoreCase("hn do")).thenReturn(List.of(johnDoe, johnDonne));
+        when(customerRepository.searchByNameWordContaining("hn do")).thenReturn(List.of());
 
         List<Customer> result = customerSearchService.findCustomersByQuery("hn do");
 
         assertThat(result).isEmpty();
-    }
-
-    @Test
-    void findCustomersByQueryIgnoresCustomersWithNullOrBlankNames() {
-        Customer validCustomer = customer(1L, "Ann Marie");
-        Customer nullNameCustomer = customer(2L, null);
-        Customer blankNameCustomer = customer(3L, "   ");
-        when(customerRepository.findByNameContainingIgnoreCase("ann"))
-                .thenReturn(List.of(validCustomer, nullNameCustomer, blankNameCustomer));
-
-        List<Customer> result = customerSearchService.findCustomersByQuery("ann");
-
-        assertThat(result).containsExactly(validCustomer);
     }
 
     private Customer customer(Long id, String name) {

@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4-read-performance-indexes
+      author: codex
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS pg_trgm;
+        - sql:
+            sql: CREATE INDEX IF NOT EXISTS idx_order_customer_id ON "order" (customer_id);
+        - sql:
+            sql: CREATE INDEX IF NOT EXISTS idx_customer_lower_name_trgm ON customer USING gin (lower(name) gin_trgm_ops);

@@ -8,13 +8,17 @@ GET {{baseUrl}}/customer?query=john
 
 ###
 
+GET {{baseUrl}}/customer?query=do
+
+###
+
+GET {{baseUrl}}/customer?query=hn%20do
+
+###
+
 POST {{baseUrl}}/customer
 Content-Type: application/json
 
 {
-  "name": "Jack Marshal"
+  "name": "Jack Marshals"
 }
-
-###
-
-GET {{baseUrl}}/customer
