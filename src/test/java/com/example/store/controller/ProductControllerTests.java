@@ -56,10 +56,11 @@ class ProductControllerTests {
         when(productRepository.save(any(Product.class))).thenReturn(product);
         when(productQueryService.findProductById(11L)).thenReturn(productDto(11L, "Keyboard", List.of()));
 
-        mockMvc.perform(post("/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                """
+        mockMvc.perform(
+                        post("/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {
                                   "description": "Keyboard"
                                 }
@@ -74,7 +75,8 @@ class ProductControllerTests {
     @Test
     void testGetAllProducts() throws Exception {
         when(productQueryService.findProducts())
-                .thenReturn(List.of(productDto(11L, "Keyboard", List.of(1L, 2L)), productDto(12L, "Mouse", List.of(2L))));
+                .thenReturn(
+                        List.of(productDto(11L, "Keyboard", List.of(1L, 2L)), productDto(12L, "Mouse", List.of(2L))));
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())

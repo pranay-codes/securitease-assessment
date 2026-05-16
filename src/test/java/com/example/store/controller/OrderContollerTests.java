@@ -86,10 +86,11 @@ class OrderControllerTests {
         when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(orderQueryService.findOrderById(1L)).thenReturn(orderDto());
 
-        mockMvc.perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                """
+        mockMvc.perform(
+                        post("/order")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {
                                   "description": "Test Order",
                                   "customerId": 1,
@@ -107,10 +108,11 @@ class OrderControllerTests {
 
     @Test
     void testCreateOrderReturnsNotFoundWhenCustomerMissing() throws Exception {
-        mockMvc.perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                """
+        mockMvc.perform(
+                        post("/order")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {
                                   "description": "Test Order",
                                   "customerId": 999,
@@ -125,10 +127,11 @@ class OrderControllerTests {
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
         when(productRepository.findAllById(List.of(999L))).thenReturn(List.of());
 
-        mockMvc.perform(post("/order")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(
-                                """
+        mockMvc.perform(
+                        post("/order")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {
                                   "description": "Test Order",
                                   "customerId": 1,

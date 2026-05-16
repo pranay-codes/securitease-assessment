@@ -11,8 +11,8 @@ import com.example.store.entity.Product;
 
 import org.mapstruct.Mapper;
 
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,14 +99,15 @@ public interface OrderMapper {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setDescription(product.getDescription());
-        dto.setOrderIds(product.getOrders() == null
-                ? Collections.emptyList()
-                : product.getOrders().stream()
-                        .filter(Objects::nonNull)
-                        .map(Order::getId)
-                        .filter(Objects::nonNull)
-                        .sorted()
-                        .toList());
+        dto.setOrderIds(
+                product.getOrders() == null
+                        ? Collections.emptyList()
+                        : product.getOrders().stream()
+                                .filter(Objects::nonNull)
+                                .map(Order::getId)
+                                .filter(Objects::nonNull)
+                                .sorted()
+                                .toList());
         return dto;
     }
 

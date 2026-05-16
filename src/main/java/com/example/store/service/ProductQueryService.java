@@ -22,6 +22,9 @@ public class ProductQueryService {
     }
 
     public ProductDTO findProductById(Long id) {
-        return productRepository.findDetailedById(id).map(orderMapper::productToProductDTO).orElse(null);
+        return productRepository
+                .findDetailedById(id)
+                .map(orderMapper::productToProductDTO)
+                .orElse(null);
     }
 }
