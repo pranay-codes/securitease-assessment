@@ -81,12 +81,25 @@ class OrderControllerTests {
     }
 
     @Test
+    void testGetOrderWhenEmpty() throws Exception {
+        when(orderRepository.findAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/order"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
     void testGetOrderById() throws Exception {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 
         mockMvc.perform(get("/order/1"))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.description").value("Test Order"))
+                .andExpect(jsonPath("$.customer.id").value(1))
                 .andExpect(jsonPath("$.customer.name").value("John Doe"));
     }
 
@@ -96,5 +109,11 @@ class OrderControllerTests {
 
         mockMvc.perform(get("/order/999999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetOrderByIdWithNonNumericId() throws Exception {
+        mockMvc.perform(get("/order/abc"))
+                .andExpect(status().isBadRequest());
     }
 }

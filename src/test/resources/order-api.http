@@ -8,6 +8,10 @@ GET {{baseUrl}}/order/1
 
 ###
 
+GET {{baseUrl}}/order/abc
+
+###
+
 POST {{baseUrl}}/order
 Content-Type: application/json
 

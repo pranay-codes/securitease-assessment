@@ -10,6 +10,15 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-16 - Expand practical subset coverage for order lookup by ID
+
+- Summary: Strengthened the single-order controller tests with full response-shape assertions, JSON content-type coverage, non-numeric path handling, and empty-list coverage for the order collection endpoint.
+- Files: `src/test/java/com/example/store/controller/OrderContollerTests.java`
+- Reason: Tighten confidence in `GET /order/{id}` using the agreed practical subset without broadening into a larger API test matrix.
+- Impact: Test coverage now checks the returned order ID, nested customer ID, JSON response type, invalid non-numeric path input, and empty-list behavior for `GET /order`.
+- Verification: Attempted `./gradlew test --tests com.example.store.controller.OrderControllerTests`, but the run remains blocked in this environment because Gradle is executing with Java 24 while the project toolchain targets Java 17, causing Jacoco task initialization to fail at `build.gradle` line 62 before tests run.
+- Risks/Follow-ups: Re-run the focused Gradle test command on a Java 17 runtime to confirm the new practical-subset tests pass.
+
 ### 2026-05-16 - Add order lookup by ID endpoint
 
 - Summary: Added `GET /order/{id}` to fetch a single order, plus controller tests for found and not-found behavior.
