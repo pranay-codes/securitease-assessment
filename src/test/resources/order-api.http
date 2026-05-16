@@ -1,0 +1,19 @@
+@baseUrl = http://localhost:8080
+
+GET {{baseUrl}}/order
+
+###
+
+POST {{baseUrl}}/order
+Content-Type: application/json
+
+{
+  "description": "Test Order",
+  "customer": {
+    "id": 1
+  }
+}
+
+###
+
+GET {{baseUrl}}/order
