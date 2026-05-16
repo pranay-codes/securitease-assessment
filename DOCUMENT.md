@@ -10,6 +10,24 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-16 - Expand customer search test coverage
+
+- Summary: Added controller tests for empty, whitespace-only, uppercase, multi-match, and second-word query scenarios, plus service tests for trimmed queries and safely ignoring null or blank customer names.
+- Files: `src/test/java/com/example/store/controller/CustomerControllerTests.java`, `src/test/java/com/example/store/service/CustomerSearchServiceTests.java`
+- Reason: Strengthen confidence in the customer query-search task without broadening the production feature contract.
+- Impact: Test coverage now validates additional HTTP-level search behaviors and service-level normalization/defensive filtering cases. No API, schema, or runtime behavior changes.
+- Verification: Attempted `./gradlew.bat test --tests "com.example.store.controller.CustomerControllerTests" --tests "com.example.store.service.CustomerSearchServiceTests"` after adding the new cases, but local verification is still blocked before test execution because Gradle is running under `C:\Program Files\Java\jdk-24` and fails while creating `:jacocoTestReport` at `build.gradle` line 62 with `Type T not present`.
+- Risks/Follow-ups: Re-run the focused Gradle test command on a Java 17 runtime that matches the project toolchain to confirm the expanded test suite compiles and passes.
+
+### 2026-05-16 - Add customer query search by name word substring
+
+- Summary: Added optional `query` support to `GET /customer`, introduced a small search service that filters matches to a single whitespace-delimited name word, and expanded controller plus service tests for search behavior.
+- Files: `src/main/java/com/example/store/controller/CustomerController.java`, `src/main/java/com/example/store/repository/CustomerRepository.java`, `src/main/java/com/example/store/service/CustomerSearchService.java`, `src/test/java/com/example/store/controller/CustomerControllerTests.java`, `src/test/java/com/example/store/service/CustomerSearchServiceTests.java`, `OpenAPI.yaml`, `src/test/resources/customer-api.http`
+- Reason: Task 2 requires the customer endpoint to support query-string search against substrings of one of the words in a customer name without breaking the existing unfiltered endpoint.
+- Impact: API behavior now supports `GET /customer?query=...` as a case-insensitive filter, while `GET /customer` and blank queries still return all customers. No schema or database migration changes.
+- Verification: Added focused WebMvc and service-unit tests for matching, no-match, blank-query, case-insensitive, and cross-word rejection scenarios. Attempted `./gradlew.bat test --tests "com.example.store.controller.CustomerControllerTests" --tests "com.example.store.service.CustomerSearchServiceTests"`, but local verification is blocked before test execution because Gradle is running under `C:\Program Files\Java\jdk-24`, and the build fails in script evaluation with `Unsupported class file major version 68`.
+- Risks/Follow-ups: Re-run the focused Gradle test command on a Java 17 runtime that matches the project toolchain to confirm compilation and runtime behavior end to end.
+
 ### 2026-05-16 - Expand practical subset coverage for order lookup by ID
 
 - Summary: Strengthened the single-order controller tests with full response-shape assertions, JSON content-type coverage, non-numeric path handling, and empty-list coverage for the order collection endpoint.

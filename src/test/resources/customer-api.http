@@ -4,6 +4,10 @@ GET {{baseUrl}}/customer
 
 ###
 
+GET {{baseUrl}}/customer?query=john
+
+###
+
 POST {{baseUrl}}/customer
 Content-Type: application/json
 

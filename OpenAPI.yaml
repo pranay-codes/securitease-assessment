@@ -79,6 +79,13 @@ paths:
       summary: Get Customers
       tags:
         - store
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional case-insensitive substring search within a single word of the customer name
       responses:
         '200':
           description: OK
@@ -89,7 +96,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Customer'
       operationId: getCustomers
-      description: Get all customers
+      description: Get all customers, or filter them by a query string against name words
     post:
       summary: Create Customer
       tags:
