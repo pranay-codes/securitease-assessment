@@ -3,6 +3,7 @@ package com.example.store.service;
 import com.example.store.dto.OrderSummaryDTO;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
+import com.example.store.entity.Product;
 import com.example.store.mapper.OrderMapperImpl;
 import com.example.store.repository.OrderRepository;
 
@@ -46,6 +47,9 @@ class OrderQueryServiceTests {
 
         assertThat(page.getContent()).hasSize(1);
         assertThat(page.getSize()).isEqualTo(100);
+        assertThat(page.getContent().get(0).getProducts())
+                .extracting(com.example.store.dto.OrderProductDTO::getDescription)
+                .containsExactly("Keyboard");
     }
 
     @Test
@@ -60,6 +64,7 @@ class OrderQueryServiceTests {
         order.setId(id);
         order.setDescription(description);
         order.setCustomer(customer);
+        order.setProducts(List.of(product(11L, "Keyboard")));
         return order;
     }
 
@@ -68,5 +73,12 @@ class OrderQueryServiceTests {
         customer.setId(id);
         customer.setName(name);
         return customer;
+    }
+
+    private Product product(Long id, String description) {
+        Product product = new Product();
+        product.setId(id);
+        product.setDescription(description);
+        return product;
     }
 }

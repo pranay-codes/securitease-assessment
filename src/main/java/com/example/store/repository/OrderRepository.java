@@ -12,11 +12,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @EntityGraph(attributePaths = "customer")
-    @Query("select o from Order o")
+    @EntityGraph(attributePaths = {"customer", "products"})
+    @Query("select distinct o from Order o")
     Page<Order> findAllWithCustomer(Pageable pageable);
 
-    @EntityGraph(attributePaths = "customer")
+    @EntityGraph(attributePaths = {"customer", "products"})
     @Query("select o from Order o where o.id = :id")
     Optional<Order> findDetailedById(@Param("id") Long id);
 }

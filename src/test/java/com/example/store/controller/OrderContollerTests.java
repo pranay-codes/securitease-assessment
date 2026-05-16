@@ -2,9 +2,11 @@ package com.example.store.controller;
 
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
+import com.example.store.entity.Product;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
+import com.example.store.repository.ProductRepository;
 import com.example.store.service.OrderQueryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,6 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,10 +49,15 @@ class OrderControllerTests {
     private CustomerRepository customerRepository;
 
     @MockitoBean
+    private ProductRepository productRepository;
+
+    @MockitoBean
     private OrderQueryService orderQueryService;
 
     private Order order;
     private Customer customer;
+    private Product firstProduct;
+    private Product secondProduct;
 
     @BeforeEach
     void setUp() {
@@ -58,19 +69,73 @@ class OrderControllerTests {
         order.setDescription("Test Order");
         order.setId(1L);
         order.setCustomer(customer);
+
+        firstProduct = new Product();
+        firstProduct.setId(11L);
+        firstProduct.setDescription("Keyboard");
+
+        secondProduct = new Product();
+        secondProduct.setId(12L);
+        secondProduct.setDescription("Mouse");
     }
 
     @Test
     void testCreateOrder() throws Exception {
-        when(orderRepository.save(order)).thenReturn(order);
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(productRepository.findAllById(List.of(11L, 12L))).thenReturn(List.of(firstProduct, secondProduct));
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
         when(orderQueryService.findOrderById(1L)).thenReturn(orderDto());
 
         mockMvc.perform(post("/order")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(order)))
+                        .content(
+                                """
+                                {
+                                  "description": "Test Order",
+                                  "customerId": 1,
+                                  "productIds": [11, 12]
+                                }
+                                """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.description").value("Test Order"))
-                .andExpect(jsonPath("$.customer.name").value("John Doe"));
+                .andExpect(jsonPath("$.customer.name").value("John Doe"))
+                .andExpect(jsonPath("$.products[0].id").value(11))
+                .andExpect(jsonPath("$.products[0].description").value("Keyboard"))
+                .andExpect(jsonPath("$.products[1].id").value(12))
+                .andExpect(jsonPath("$.products[1].description").value("Mouse"));
+    }
+
+    @Test
+    void testCreateOrderReturnsNotFoundWhenCustomerMissing() throws Exception {
+        mockMvc.perform(post("/order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                {
+                                  "description": "Test Order",
+                                  "customerId": 999,
+                                  "productIds": [11]
+                                }
+                                """))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testCreateOrderReturnsNotFoundWhenProductMissing() throws Exception {
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(productRepository.findAllById(List.of(999L))).thenReturn(List.of());
+
+        mockMvc.perform(post("/order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                """
+                                {
+                                  "description": "Test Order",
+                                  "customerId": 1,
+                                  "productIds": [999]
+                                }
+                                """))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -89,6 +154,10 @@ class OrderControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].description").value("Test Order"))
                 .andExpect(jsonPath("$.content[0].customer.name").value("John Doe"))
+                .andExpect(jsonPath("$.content[0].products[0].id").value(11))
+                .andExpect(jsonPath("$.content[0].products[0].description").value("Keyboard"))
+                .andExpect(jsonPath("$.content[0].products[1].id").value(12))
+                .andExpect(jsonPath("$.content[0].products[1].description").value("Mouse"))
                 .andExpect(jsonPath("$.size").value(20))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
@@ -122,7 +191,11 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.description").value("Test Order"))
                 .andExpect(jsonPath("$.customer.id").value(1))
-                .andExpect(jsonPath("$.customer.name").value("John Doe"));
+                .andExpect(jsonPath("$.customer.name").value("John Doe"))
+                .andExpect(jsonPath("$.products[0].id").value(11))
+                .andExpect(jsonPath("$.products[0].description").value("Keyboard"))
+                .andExpect(jsonPath("$.products[1].id").value(12))
+                .andExpect(jsonPath("$.products[1].description").value("Mouse"));
     }
 
     @Test
@@ -146,6 +219,7 @@ class OrderControllerTests {
         orderDTO.setId(1L);
         orderDTO.setDescription("Test Order");
         orderDTO.setCustomer(orderCustomerDTO);
+        orderDTO.setProducts(java.util.List.of(orderProductDto(11L, "Keyboard"), orderProductDto(12L, "Mouse")));
         return orderDTO;
     }
 
@@ -154,6 +228,14 @@ class OrderControllerTests {
         orderSummaryDTO.setId(1L);
         orderSummaryDTO.setDescription("Test Order");
         orderSummaryDTO.setCustomer(orderDto().getCustomer());
+        orderSummaryDTO.setProducts(orderDto().getProducts());
         return orderSummaryDTO;
+    }
+
+    private com.example.store.dto.OrderProductDTO orderProductDto(Long id, String description) {
+        com.example.store.dto.OrderProductDTO orderProductDTO = new com.example.store.dto.OrderProductDTO();
+        orderProductDTO.setId(id);
+        orderProductDTO.setDescription(description);
+        return orderProductDTO;
     }
 }

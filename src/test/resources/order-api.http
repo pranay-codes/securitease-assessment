@@ -34,7 +34,6 @@ Content-Type: application/json
 
 {
   "description": "Test Order",
-  "customer": {
-    "id": 4
-  }
+  "customerId": 4,
+  "productIds": [1, 2]
 }
