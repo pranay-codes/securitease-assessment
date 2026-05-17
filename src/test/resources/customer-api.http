@@ -4,7 +4,7 @@ GET {{baseUrl}}/customer
 
 ###
 
-GET {{baseUrl}}/customer?query=john
+GET {{baseUrl}}/customer?query=blue
 
 ###
 
@@ -12,7 +12,7 @@ GET {{baseUrl}}/customer?query=do
 
 ###
 
-GET {{baseUrl}}/customer?query=hn%20do
+GET {{baseUrl}}/customer?query=r%bl
 
 ###
 
@@ -20,5 +20,12 @@ POST {{baseUrl}}/customer
 Content-Type: application/json
 
 {
-  "name": "Jack Marshals"
+  "name": "Mr Blue"
 }
+
+###
+
+POST {{baseUrl}}/customer
+Content-Type: application/json
+
+{

@@ -1,6 +1,5 @@
 package com.example.store.controller;
 
-import com.example.store.dto.ApiErrorResponse;
 import com.example.store.dto.CreateOrderRequest;
 import com.example.store.dto.OrderDTO;
 import com.example.store.dto.OrderSummaryDTO;
@@ -12,7 +11,6 @@ import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
 import com.example.store.service.OrderQueryService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -23,8 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 @RestController
@@ -38,28 +34,22 @@ public class OrderController {
     private final OrderQueryService orderQueryService;
 
     @GetMapping
-    public Page<OrderSummaryDTO> getAllOrders(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        return orderQueryService.findOrders(pageable);
+    public ResponseEntity<Page<OrderSummaryDTO>> getAllOrders(
+            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(orderQueryService.findOrders(pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         OrderDTO order = orderQueryService.findOrderById(id);
         if (order == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiErrorResponse(
-                            OffsetDateTime.now(ZoneOffset.UTC).toString(),
-                            HttpStatus.NOT_FOUND.value(),
-                            HttpStatus.NOT_FOUND.getReasonPhrase(),
-                            String.format("Order with id %d was not found", id),
-                            request.getRequestURI()));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Order with id %d was not found", id));
         }
         return ResponseEntity.ok(order);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public OrderDTO createOrder(@RequestBody CreateOrderRequest request) {
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody CreateOrderRequest request) {
         if (request.getProductIds() == null || request.getProductIds().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order must contain at least one product");
         }
@@ -79,6 +69,6 @@ public class OrderController {
         order.setProducts(products);
 
         Order savedOrder = orderRepository.save(order);
-        return orderQueryService.findOrderById(savedOrder.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderQueryService.findOrderById(savedOrder.getId()));
     }
 }

@@ -10,6 +10,7 @@ import com.example.store.service.CustomerSearchService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,13 +25,14 @@ public class CustomerController {
     private final CustomerSearchService customerSearchService;
 
     @GetMapping
-    public List<CustomerSummaryDTO> getAllCustomers(@RequestParam(required = false) String query) {
-        return customerMapper.customersToCustomerSummaryDTOs(customerSearchService.findCustomersByQuery(query));
+    public ResponseEntity<List<CustomerSummaryDTO>> getAllCustomers(@RequestParam(required = false) String query) {
+        return ResponseEntity.ok(
+                customerMapper.customersToCustomerSummaryDTOs(customerSearchService.findCustomersByQuery(query)));
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDTO createCustomer(@RequestBody Customer customer) {
-        return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody Customer customer) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(customerMapper.customerToCustomerDTO(customerRepository.save(customer)));
     }
 }

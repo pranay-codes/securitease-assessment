@@ -119,7 +119,13 @@ class OrderControllerTests {
                                   "productIds": [11]
                                 }
                                 """))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.path").value("/order"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @Test
@@ -138,7 +144,35 @@ class OrderControllerTests {
                                   "productIds": [999]
                                 }
                                 """))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("One or more products not found"))
+                .andExpect(jsonPath("$.path").value("/order"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @Test
+    void testCreateOrderReturnsBadRequestWhenProductIdsMissing() throws Exception {
+        mockMvc.perform(
+                        post("/order")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                {
+                                  "description": "Test Order",
+                                  "customerId": 1,
+                                  "productIds": []
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Order must contain at least one product"))
+                .andExpect(jsonPath("$.path").value("/order"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @Test
@@ -217,7 +251,14 @@ class OrderControllerTests {
 
     @Test
     void testGetOrderByIdWithNonNumericId() throws Exception {
-        mockMvc.perform(get("/order/abc")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/order/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Invalid value 'abc' for parameter 'id'"))
+                .andExpect(jsonPath("$.path").value("/order/abc"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     private com.example.store.dto.OrderDTO orderDto() {

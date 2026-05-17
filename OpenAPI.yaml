@@ -71,9 +71,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
         '400':
-          description: Order must contain at least one product
+          description: Invalid order request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         '404':
           description: Customer or product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /order/{id}:
     get:
       summary: Get Order By ID
@@ -122,17 +130,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomerSummary'
+        '400':
+          description: Invalid customer request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       operationId: getCustomers
       description: Get all customers, or filter them by a query string against name words
     post:
       summary: Create Customer
       tags:
         - store
-      responses:
-        '201':
-          description: Created
-      operationId: createCustomer
-      description: Create a new customer
       requestBody:
         content:
           application/json:
@@ -144,6 +153,21 @@ paths:
                   format: int64
                 name:
                   type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Invalid customer request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      operationId: createCustomer
+      description: Create a new customer
   /products:
     get:
       summary: Get Products
@@ -158,6 +182,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid product request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       operationId: getProducts
       description: Get all products
     post:
@@ -179,6 +209,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid product request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /products/{id}:
     get:
       summary: Get Product By ID
@@ -200,6 +236,10 @@ paths:
                 $ref: '#/components/schemas/Product'
         '404':
           description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       operationId: getProductById
       description: Get a specific product by ID
 components:

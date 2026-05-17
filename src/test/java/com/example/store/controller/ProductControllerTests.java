@@ -106,12 +106,38 @@ class ProductControllerTests {
     void testGetProductByIdNotFound() throws Exception {
         when(productQueryService.findProductById(999L)).thenReturn(null);
 
-        mockMvc.perform(get("/products/999")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/products/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Product not found"))
+                .andExpect(jsonPath("$.path").value("/products/999"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @Test
     void testGetProductByIdWithNonNumericId() throws Exception {
-        mockMvc.perform(get("/products/abc")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/products/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Invalid value 'abc' for parameter 'id'"))
+                .andExpect(jsonPath("$.path").value("/products/abc"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
+    @Test
+    void testCreateProductReturnsBadRequestForMalformedJson() throws Exception {
+        mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON).content("{"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Malformed JSON request body"))
+                .andExpect(jsonPath("$.path").value("/products"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     private ProductDTO productDto(Long id, String description, List<Long> orderIds) {

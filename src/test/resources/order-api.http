@@ -37,6 +37,17 @@ POST {{baseUrl}}/order
 Content-Type: application/json
 
 {
+  "description": "Order missing products",
+  "customerId": 10,
+  "productIds": []
+}
+
+###
+
+POST {{baseUrl}}/order
+Content-Type: application/json
+
+{
   "description": "Order for Samsung Galaxy S21",
   "customerId": 10,
   "productIds": [1]

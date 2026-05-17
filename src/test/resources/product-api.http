@@ -4,7 +4,7 @@ POST {{baseUrl}}/products
 Content-Type: application/json
 
 {
-  "description": "Samsung Galaxy S21"
+  "description": "Ballpoint pen"
 }
 
 ###
@@ -13,4 +13,15 @@ GET {{baseUrl}}/products
 
 ###
 
-GET {{baseUrl}}/products/1
+GET {{baseUrl}}/products/3
+
+###
+
+GET {{baseUrl}}/products/abc
+
+###
+
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{

@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 4-read-performance-indexes
-      author: codex
+      author: pranay
       changes:
         - sql:
             sql: CREATE EXTENSION IF NOT EXISTS pg_trgm;

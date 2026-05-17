@@ -161,4 +161,16 @@ class CustomerControllerTests {
                 .andExpect(jsonPath("$[0].name").value("John Doe"))
                 .andExpect(jsonPath("$[1].name").value("Alice Smith"));
     }
+
+    @Test
+    void testCreateCustomerReturnsBadRequestForMalformedJson() throws Exception {
+        mockMvc.perform(post("/customer").contentType(MediaType.APPLICATION_JSON).content("{"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Malformed JSON request body"))
+                .andExpect(jsonPath("$.path").value("/customer"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
 }

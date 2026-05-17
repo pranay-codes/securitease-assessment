@@ -10,6 +10,24 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-17 - Standardize API responses with ResponseEntity and shared error bodies
+
+- Summary: Updated all API controllers to return typed `ResponseEntity` success responses, added a shared `@RestControllerAdvice` that emits the existing `ApiErrorResponse` shape for business 4xx errors and common request parsing/type errors, and aligned tests plus API docs with that contract.
+- Files: `src/main/java/com/example/store/controller/OrderController.java`, `src/main/java/com/example/store/controller/CustomerController.java`, `src/main/java/com/example/store/controller/ProductController.java`, `src/main/java/com/example/store/controller/ApiExceptionHandler.java`, `src/test/java/com/example/store/controller/OrderContollerTests.java`, `src/test/java/com/example/store/controller/CustomerControllerTests.java`, `src/test/java/com/example/store/controller/ProductControllerTests.java`, `OpenAPI.yaml`, `src/test/resources/order-api.http`, `src/test/resources/customer-api.http`, `src/test/resources/product-api.http`, `DOCUMENT.md`
+- Reason: The API was mixing raw controller returns, `@ResponseStatus`, controller-local error bodies, and default Spring error rendering, which made error payloads inconsistent across endpoints.
+- Impact: Successful responses keep their existing DTO/list/page payloads but now use explicit `ResponseEntity` statuses. Client-visible 4xx failures for not-found, invalid path values, malformed JSON, and current order business-rule errors now return a consistent JSON error body with `timestamp`, `status`, `error`, `message`, and `path`.
+- Verification: Added controller assertions for standardized error bodies on missing order/product/customer scenarios, empty order products, non-numeric path variables, and malformed JSON. Attempted `./gradlew.bat test --tests "com.example.store.controller.OrderControllerTests" --tests "com.example.store.controller.ProductControllerTests" --tests "com.example.store.controller.CustomerControllerTests"`, but the run is still blocked before test execution by the existing local Java 24 versus project Java 17/JaCoCo issue at `build.gradle` line 66: `Could not create task ':jacocoTestReport'` caused by `Type T not present`.
+- Risks/Follow-ups: This change intentionally standardizes only the current 4xx API surface and does not introduce a generic 500 error contract. If broader exception mapping is desired later, extend the shared advice deliberately and update the OpenAPI spec to match.
+
+### 2026-05-17 - Guard changelog 5 table creation when tables already exist
+
+- Summary: Updated the product and order-product table creation statements in Liquibase changelog 5 to use PostgreSQL existence guards so the migration does not fail when those tables are already present.
+- Files: `src/main/resources/db/changelog/db.changelog-5.yaml`, `DOCUMENT.md`
+- Reason: The changelog previously used unconditional `CREATE TABLE` statements, which could fail in environments where `product` or `order_product` had already been created before this migration ran.
+- Impact: Schema intent is unchanged, but the changelog is now safer to run against databases that already contain one or both tables. Existing `CREATE INDEX IF NOT EXISTS` behavior remains unchanged.
+- Verification: Reviewed the migration after the edit to confirm both table-creation statements now use `CREATE TABLE IF NOT EXISTS`. Full Gradle/Liquibase runtime verification was not run in this follow-up; this checkout has existing local Java 24 versus project Java 17/JaCoCo compatibility issues, so the verification here is limited to the migration text change itself.
+- Risks/Follow-ups: This makes the table creation tolerant of pre-existing tables, but it does not reconcile schema drift if an existing table definition differs from the expected structure. If checksum-sensitive Liquibase environments have already recorded the old changelog 5 checksum, they may need the usual checksum-handling process before re-running this modified changeset.
+
 ### 2026-05-17 - Add explicit 404 message for missing order lookup
 
 - Summary: Changed `GET /order/{id}` to return an explicit JSON error body with a human-readable `message` when an order ID does not exist, and documented that error shape in the OpenAPI spec.

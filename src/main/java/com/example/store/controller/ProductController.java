@@ -9,12 +9,12 @@ import com.example.store.service.ProductQueryService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,25 +29,24 @@ public class ProductController {
     private final ProductQueryService productQueryService;
 
     @GetMapping
-    public List<ProductDTO> getAllProducts() {
-        return productQueryService.findProducts();
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return ResponseEntity.ok(productQueryService.findProducts());
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         ProductDTO product = productQueryService.findProductById(id);
         if (product == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
-        return product;
+        return ResponseEntity.ok(product);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductDTO createProduct(@RequestBody CreateProductRequest request) {
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody CreateProductRequest request) {
         Product product = new Product();
         product.setDescription(request.getDescription());
         Product savedProduct = productRepository.save(product);
-        return productQueryService.findProductById(savedProduct.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(productQueryService.findProductById(savedProduct.getId()));
     }
 }
