@@ -98,4 +98,4 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Log primary image reference
-        run: echo "If this run published, pull with: docker pull ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:main"
+        run: echo "If this run published, pull with- docker pull ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:main"
