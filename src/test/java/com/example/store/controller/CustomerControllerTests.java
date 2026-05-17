@@ -164,7 +164,9 @@ class CustomerControllerTests {
 
     @Test
     void testCreateCustomerReturnsBadRequestForMalformedJson() throws Exception {
-        mockMvc.perform(post("/customer").contentType(MediaType.APPLICATION_JSON).content("{"))
+        mockMvc.perform(post("/customer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(400))

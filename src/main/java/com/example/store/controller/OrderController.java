@@ -43,7 +43,8 @@ public class OrderController {
     public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         OrderDTO order = orderQueryService.findOrderById(id);
         if (order == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Order with id %d was not found", id));
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, String.format("Order with id %d was not found", id));
         }
         return ResponseEntity.ok(order);
     }

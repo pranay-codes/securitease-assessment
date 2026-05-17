@@ -47,6 +47,7 @@ public class ProductController {
         Product product = new Product();
         product.setDescription(request.getDescription());
         Product savedProduct = productRepository.save(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productQueryService.findProductById(savedProduct.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productQueryService.findProductById(savedProduct.getId()));
     }
 }

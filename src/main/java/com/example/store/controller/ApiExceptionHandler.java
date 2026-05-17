@@ -30,8 +30,8 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        String message = String.format(
-                "Invalid value '%s' for parameter '%s'", exception.getValue(), exception.getName());
+        String message =
+                String.format("Invalid value '%s' for parameter '%s'", exception.getValue(), exception.getName());
         return ResponseEntity.status(status).body(buildErrorResponse(status, message, request.getRequestURI()));
     }
 
@@ -45,11 +45,7 @@ public class ApiExceptionHandler {
 
     private ApiErrorResponse buildErrorResponse(HttpStatus status, String message, String path) {
         return new ApiErrorResponse(
-                OffsetDateTime.now(ZoneOffset.UTC).toString(),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
-                path);
+                OffsetDateTime.now(ZoneOffset.UTC).toString(), status.value(), status.getReasonPhrase(), message, path);
     }
 
     private HttpStatus resolveStatus(int statusCode) {
