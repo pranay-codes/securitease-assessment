@@ -95,6 +95,10 @@ paths:
                 $ref: '#/components/schemas/Order'
         '404':
           description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
       operationId: getOrderById
       description: Get a specific order by ID
   /customer:
@@ -200,6 +204,21 @@ paths:
       description: Get a specific product by ID
 components:
   schemas:
+    ApiError:
+      title: ApiError
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
     CreateOrderRequest:
       title: CreateOrderRequest
       type: object

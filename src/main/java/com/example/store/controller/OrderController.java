@@ -1,5 +1,6 @@
 package com.example.store.controller;
 
+import com.example.store.dto.ApiErrorResponse;
 import com.example.store.dto.CreateOrderRequest;
 import com.example.store.dto.OrderDTO;
 import com.example.store.dto.OrderSummaryDTO;
@@ -11,15 +12,19 @@ import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
 import com.example.store.service.OrderQueryService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @RestController
@@ -38,12 +43,18 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public OrderDTO getOrderById(@PathVariable Long id) {
+    public ResponseEntity<?> getOrderById(@PathVariable Long id, HttpServletRequest request) {
         OrderDTO order = orderQueryService.findOrderById(id);
         if (order == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiErrorResponse(
+                            OffsetDateTime.now(ZoneOffset.UTC).toString(),
+                            HttpStatus.NOT_FOUND.value(),
+                            HttpStatus.NOT_FOUND.getReasonPhrase(),
+                            String.format("Order with id %d was not found", id),
+                            request.getRequestURI()));
         }
-        return order;
+        return ResponseEntity.ok(order);
     }
 
     @PostMapping

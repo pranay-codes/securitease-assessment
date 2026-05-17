@@ -10,6 +10,15 @@ This file records all implementation changes made for the assessment.
 
 ## Change Log
 
+### 2026-05-17 - Add explicit 404 message for missing order lookup
+
+- Summary: Changed `GET /order/{id}` to return an explicit JSON error body with a human-readable `message` when an order ID does not exist, and documented that error shape in the OpenAPI spec.
+- Files: `src/main/java/com/example/store/controller/OrderController.java`, `src/main/java/com/example/store/dto/ApiErrorResponse.java`, `src/test/java/com/example/store/controller/OrderContollerTests.java`, `OpenAPI.yaml`, `DOCUMENT.md`
+- Reason: The default Spring 404 body for this endpoint omitted the exception reason, so callers could see that the request failed but not which order lookup failed.
+- Impact: Missing-order requests now return a local endpoint-specific 404 payload with `timestamp`, `status`, `error`, `message`, and `path`. Successful order lookup behavior is unchanged.
+- Verification: Added WebMvc assertions for the 404 response body in `OrderContollerTests`. Full Gradle verification was not run in this follow-up because prior runs in this checkout have repeatedly been blocked on the local Java 24 versus project Java 17/JaCoCo mismatch; the new test coverage records the intended contract.
+- Risks/Follow-ups: This improves only the missing-order lookup path in `OrderController`; other endpoints that still rely on generic Spring error rendering will continue to use their existing response shapes unless we standardize them separately.
+
 ### 2026-05-16 - Remove Docker runtime smoke testing from CI
 
 - Summary: Simplified the GitHub Actions delivery pipeline by removing the PostgreSQL service container and Docker runtime smoke test, while keeping Gradle validation plus Docker build and GHCR publish behavior.

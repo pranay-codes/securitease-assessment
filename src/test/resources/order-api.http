@@ -21,7 +21,11 @@ GET {{baseUrl}}/order?page=0&size=250
 
 ###
 
-GET {{baseUrl}}/order/10004
+GET {{baseUrl}}/order/1004
+
+###
+
+GET {{baseUrl}}/order/199944
 
 ###
 
@@ -33,7 +37,7 @@ POST {{baseUrl}}/order
 Content-Type: application/json
 
 {
-  "description": "Test Order",
-  "customerId": 4,
+  "description": "Order for Samsung Galaxy S21",
+  "customerId": 10,
   "productIds": [1]
 }

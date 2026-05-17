@@ -205,7 +205,14 @@ class OrderControllerTests {
     void testGetOrderByIdNotFound() throws Exception {
         when(orderQueryService.findOrderById(999999L)).thenReturn(null);
 
-        mockMvc.perform(get("/order/999999")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/order/999999"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Order with id 999999 was not found"))
+                .andExpect(jsonPath("$.path").value("/order/999999"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     @Test
